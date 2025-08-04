@@ -1,86 +1,363 @@
-<!DOCTYPE html><html lang="en">
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Panel</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SHIFRA Assistant</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Poppins:wght@400;500&display=swap');
     body {
-      font-family: Arial, sans-serif;
-      background: #f2f2f2;
-      padding: 20px;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    form {
-      max-width: 500px;
-      margin: 0 auto;
-      background: #fff;
-      padding: 20px;
-      border-radius: 12px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    }
-    label {
-      display: block;
-      margin-top: 15px;
-    }
-    input[type="text"],
-    textarea,
-    input[type="file"] {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-    }
-    button {
-      margin-top: 20px;
-      background-color: #007BFF;
+      margin: 0;
+      padding: 0;
+      background: #0a0a0a;
+      font-family: 'Poppins', sans-serif;
       color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      justify-content: space-between;
     }
-    button:hover {
-      background-color: #0056b3;
+
+    .title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 2rem;
+      padding: 20px;
+      text-align: center;
+      background: linear-gradient(to right, #ff007f, #00ffff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      position: relative;
+    }
+
+    .title::after {
+      content: "Beta Version";
+      position: absolute;
+      bottom: 5px;
+      right: 20px;
+      font-size: 0.6rem;
+      color: #aaa;
+    }
+
+    .chat-box {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      background: radial-gradient(circle at center, #1a1a1a 0%, #0a0a0a 100%);
+    }
+
+    .message {
+      margin: 5px 0;
+      padding: 10px 15px;
+      border-radius: 20px;
+      max-width: 80%;
+      position: relative;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .user {
+      align-self: flex-end;
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      color: white;
+      border-bottom-right-radius: 5px;
+    }
+
+    .bot {
+      align-self: flex-start;
+      background: #222;
+      border-bottom-left-radius: 5px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+
+    .input-area {
+      display: flex;
+      align-items: center;
+      padding: 15px;
+      background: #111;
+      border-top: 1px solid #333;
+    }
+
+    .input-area input {
+      flex-grow: 1;
+      background: #222;
+      border: 1px solid #444;
+      border-radius: 25px;
+      padding: 12px 20px;
+      color: white;
+      outline: none;
+      margin-right: 10px;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+
+    .input-area input:focus {
+      border-color: #6a11cb;
+      box-shadow: 0 0 0 2px rgba(106,17,203,0.3);
+    }
+
+    .input-area button {
+      background: linear-gradient(135deg, #6a11cb, #2575fc);
+      border: none;
+      border-radius: 50%;
+      width: 45px;
+      height: 45px;
+      margin-left: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .input-area button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 10px rgba(106,17,203,0.5);
+    }
+
+    .input-area button:active {
+      transform: scale(0.98);
+    }
+
+    .input-area svg {
+      width: 20px;
+      height: 20px;
+      color: white;
+    }
+
+    .typing-indicator {
+      display: inline-block;
+      padding: 10px 15px;
+      background: #222;
+      border-radius: 20px;
+      margin: 5px 0;
+      align-self: flex-start;
+    }
+
+    .typing-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #666;
+      margin: 0 2px;
+      animation: typingAnimation 1.4s infinite ease-in-out;
+    }
+
+    .typing-dot:nth-child(1) { animation-delay: 0s; }
+    .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes typingAnimation {
+      0%, 60%, 100% { transform: translateY(0); }
+      30% { transform: translateY(-5px); }
+    }
+
+    .command-hint {
+      font-size: 0.8rem;
+      color: #aaa;
+      text-align: center;
+      padding: 5px;
+      margin-top: 5px;
     }
   </style>
 </head>
 <body>
-  <h1>Admin Panel</h1>
-  <form id="uploadForm" enctype="multipart/form-data">
-    <label>App Name:</label>
-    <input type="text" name="name" required><label>Description:</label>
-<textarea name="description" rows="4"></textarea>
 
-<label>App Logo:</label>
-<input type="file" name="logo" accept="image/*" required>
+  <div class="title">SHIFRA Assistant</div>
 
-<label>APK Download Link:</label>
-<input type="text" name="apkLink" required>
+  <div class="chat-box" id="chatBox">
+    <div class="message bot">
+      नमस्ते! मैं SHIFRA Assistant हूँ।<br>आप मुझसे हिंदी या अंग्रेज़ी में बात कर सकते हैं।
+      <div class="command-hint">Try: "Open YouTube" or "Search for cricket"</div>
+    </div>
+  </div>
 
-<button type="submit">Upload App</button>
+  <div class="input-area">
+    <input type="text" id="userInput" placeholder="Ask anything (हिंदी/English)..." />
+    <button onclick="startRecognition()" title="Voice">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+        <line x1="12" y1="19" x2="12" y2="23"></line>
+        <line x1="8" y1="23" x2="16" y2="23"></line>
+      </svg>
+    </button>
+    <button onclick="sendMessage()" title="Send">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"></line>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+      </svg>
+    </button>
+  </div>
 
-  </form>  <script>
-    const form = document.getElementById('uploadForm');
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const formData = new FormData(form);
+  <script>
+    const chatBox = document.getElementById('chatBox');
+    const userInput = document.getElementById('userInput');
+    let isSpeaking = false;
 
-      const res = await fetch('http://localhost:5000/upload', {
-        method: 'POST',
-        body: formData
-      });
+    // Initial greeting
+    speak("नमस्ते! मैं SHIFRA Assistant हूँ। आप मुझसे हिंदी या अंग्रेज़ी में बात कर सकते हैं।");
 
-      const result = await res.json();
-      if (res.ok) {
-        alert('App uploaded successfully!');
-        form.reset();
+    function appendMessage(text, sender) {
+      const msg = document.createElement('div');
+      msg.classList.add('message', sender);
+      
+      // Handle line breaks and basic formatting
+      msg.innerHTML = text.replace(/\n/g, '<br>');
+      
+      chatBox.appendChild(msg);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function showTypingIndicator() {
+      const typing = document.createElement('div');
+      typing.classList.add('typing-indicator');
+      typing.id = 'typingIndicator';
+      typing.innerHTML = `
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+      `;
+      chatBox.appendChild(typing);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function hideTypingIndicator() {
+      const typing = document.getElementById('typingIndicator');
+      if (typing) {
+        typing.remove();
+      }
+    }
+
+    function sendMessage() {
+      const text = userInput.value.trim();
+      if (text === '') return;
+      
+      appendMessage(text, 'user');
+      userInput.value = '';
+      
+      showTypingIndicator();
+      
+      // Simulate processing delay
+      setTimeout(() => {
+        hideTypingIndicator();
+        respondTo(text.toLowerCase());
+      }, 1000 + Math.random() * 1000);
+    }
+
+    function respondTo(input) {
+      let response = "";
+      let action = null;
+      
+      // Hindi commands
+      if (input.includes('यूट्यूब खोलो') || input.includes('open youtube')) {
+        response = "यूट्यूब खोल रहा हूँ...";
+        action = () => window.open("https://youtube.com", "_blank");
+      } 
+      else if (input.includes('गूगल खोलो') || input.includes('open google')) {
+        response = "गूगल खोल रहा हूँ...";
+        action = () => window.open("https://google.com", "_blank");
+      }
+      else if (input.includes('फेसबुक खोलो') || input.includes('open facebook')) {
+        response = "फेसबुक खोल रहा हूँ...";
+        action = () => window.open("https://facebook.com", "_blank");
+      }
+      else if (input.includes('खोजो') || input.includes('search for')) {
+        const query = input.replace('खोजो', '').replace('search for', '').trim();
+        response = `"${query}" के लिए खोज रहा हूँ...`;
+        action = () => window.open(`https://www.google.com/search?q=${encodeURIComponent(query)}`, '_blank');
+      }
+      else if (input.includes('नमस्ते') || input.includes('hello') || input.includes('hi')) {
+        response = "नमस्ते! मैं SHIFRA Assistant हूँ। आपके लिए क्या कर सकता हूँ?";
+      }
+      else if (input.includes('धन्यवाद') || input.includes('thank you')) {
+        response = "आपका स्वागत है! मुझे और किसी चीज़ में मदद करनी है?";
+      }
+      else {
+        response = "माफ़ कीजिए, मैं समझ नहीं पाया। कृपया 'यूट्यूब खोलो' या 'क्रिकेट खोजो' जैसे कमांड आज़माएँ।";
+      }
+      
+      appendMessage(response, 'bot');
+      speak(response);
+      
+      if (action) {
+        setTimeout(action, 1000);
+      }
+    }
+
+    function speak(text) {
+      if (isSpeaking) return;
+      
+      isSpeaking = true;
+      const utterance = new SpeechSynthesisUtterance(text);
+      
+      // Set Hindi or English voice automatically
+      const hindiRegex = /[\u0900-\u097F]/;
+      if (hindiRegex.test(text)) {
+        utterance.lang = 'hi-IN';
+        utterance.rate = 0.9;
       } else {
-        alert('Upload failed: ' + result.message);
+        utterance.lang = 'en-US';
+      }
+      
+      utterance.onend = () => {
+        isSpeaking = false;
+      };
+      
+      speechSynthesis.speak(utterance);
+    }
+
+    function startRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        appendMessage("आपका ब्राउज़र वॉइस रिकग्निशन सपोर्ट नहीं करता।", 'bot');
+        return;
+      }
+
+      const recognition = new SpeechRecognition();
+      
+      // Support both Hindi and English
+      recognition.lang = 'hi-IN, en-US';
+      recognition.interimResults = false;
+      recognition.maxAlternatives = 1;
+      
+      // Show listening indicator
+      userInput.placeholder = "सुन रहा हूँ...";
+      
+      recognition.start();
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        userInput.placeholder = "Ask anything (हिंदी/English)...";
+        userInput.value = transcript;
+        sendMessage();
+      };
+
+      recognition.onerror = (event) => {
+        userInput.placeholder = "Ask anything (हिंदी/English)...";
+        console.error("Speech recognition error", event);
+        appendMessage("वॉइस समझने में समस्या हुई। कृपया फिर से कोशिश करें।", 'bot');
+      };
+    }
+
+    // Handle Enter key
+    userInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        sendMessage();
       }
     });
-  </script></body>
+
+    // Focus input on page load
+    window.addEventListener('load', () => {
+      userInput.focus();
+    });
+  </script>
+
+</body>
 </html>
